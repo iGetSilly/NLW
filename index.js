@@ -1,7 +1,67 @@
-const { select } = require("@inquirer/prompts")
+const { select, input, checkbox } = require("@inquirer/prompts")
+
+let meta = {
+    value: "Tomar 3L de água por dia",
+    checked: false,
+}
+
+let metas = [meta]
+
+const cadastrarMeta = async () => {
+    const meta = await input({ message: "Digite a meta:" })
+
+    if (meta.length == 0) {
+        console.log("A meta não pode ser vazia.")
+        return
+    }
+
+    metas.push(
+        { value: meta, checked: false }
+    )
+}
+
+const listarMeta = async () => {
+    const respostas = await checkbox({
+        message: "Use as setas para mudar de meta, o espaço para marcar ou desmarcar e o enter para finalizar essa etapa",
+        choices: [...metas],
+        instructions: false,
+    })
+
+    if (respostas.length == 0) {
+        console.log("Nenhuma meta seleciona!")
+        return
+    }
+
+    metas.forEach((metas) => {
+        metas.checked = false
+    })
+
+    respostas.forEach((respostas) => {
+        const meta = metas.find((meta) => {
+            return meta.value == respostas
+        })
+        meta.checked = true
+    })
+}
+
+const metasRealizadas = async () => {
+    const realizadas = metas.filter((meta) => {
+        return meta.checked
+    })
+
+    if (realizadas.length == 0) {
+        console.log("Não existem metas realizadas!")
+        return
+    }
+
+    await select({
+        message: "Metas Realizadas",
+        choices: [...realizadas]
+    })
+}
 
 const start = async () => {
-    while(true) {
+    while (true) {
         const opcao = await select({
             message: "Menu >",
             choices: [
@@ -14,6 +74,10 @@ const start = async () => {
                     value: "listar"
                 },
                 {
+                    name: "Metas Realizadas",
+                    value: "realizadas"
+                },
+                {
                     name: "Sair",
                     value: "sair"
                 }
@@ -22,10 +86,13 @@ const start = async () => {
 
         switch (opcao) {
             case "cadastrar":
-                console.log("Vamos cadastrar")
+                await cadastrarMeta()
                 break
             case "listar":
-                console.log("Vamos listas")
+                await listarMeta()
+                break
+            case "realizadas":
+                await metasRealizadas()
                 break
             case "sair":
                 console.log("Saindo")
