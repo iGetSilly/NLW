@@ -1,5 +1,6 @@
 const { select, input, checkbox } = require("@inquirer/prompts")
 
+let mensagem = "Bem vindo ao app de metas!"
 let meta = {
     value: "Tomar 3L de água por dia",
     checked: false,
@@ -18,6 +19,8 @@ const cadastrarMeta = async () => {
     metas.push(
         { value: meta, checked: false }
     )
+
+    mensagem = "Meta cadastrada com sucesso"
 }
 
 const listarMeta = async () => {
@@ -32,7 +35,7 @@ const listarMeta = async () => {
     })
 
     if (respostas.length == 0) {
-        console.log("Nenhuma meta seleciona!")
+        mensagem = "Nenhuma meta seleciona!"
         return
     }
 
@@ -42,6 +45,8 @@ const listarMeta = async () => {
         })
         meta.checked = true
     })
+
+    mensagem = "Metas listadas com sucesso"
 }
 
 const metasRealizadas = async () => {
@@ -50,7 +55,7 @@ const metasRealizadas = async () => {
     })
 
     if (realizadas.length == 0) {
-        console.log("Não existem metas realizadas!")
+        mensagem = "Não existem metas realizadas!"
         return
     }
 
@@ -58,6 +63,8 @@ const metasRealizadas = async () => {
         message: "Metas Realizadas",
         choices: [...realizadas]
     })
+
+    mensagem = "Todas as metas realizadas:"
 }
 
 const metasAbertas = async () => {
@@ -66,19 +73,21 @@ const metasAbertas = async () => {
     })
 
     if (abertas.lenght == 0) {
-        console.log("Não existem metas abertas!")
+        mensagem = "Não existem metas abertas!"
         return
     }
 
-    await select ({
-        message: "Metas Abertas " + abertas.lenght,
+    await select({
+        message: "Metas Abertas " + abertas.lenght(),
         choices: [...abertas]
     })
+
+    mensagem = "Todas as metas abertas:"
 }
 
 const removerMetas = async () => {
     const metasDesmarcadas = metas.map((meta) => {
-        return {value: meta.value, checked: false}
+        return { value: meta.value, checked: false }
     })
 
     const respostas = await checkbox({
@@ -88,7 +97,7 @@ const removerMetas = async () => {
     })
 
     if (respostas.length == 0) {
-        console.log("Não há itens para remover!")
+        mensagem = "Não há itens para remover!"
         return
     }
 
@@ -98,11 +107,22 @@ const removerMetas = async () => {
         })
     })
 
-    console.log("Meta(s) deletada(s) com sucesso!")
+    mensagem = "Meta(s) deletada(s) com sucesso!"
+}
+
+const mostrarMensagem = () => {
+    console.clear()
+
+    if(mensagem != "") {
+        console.log(mensagem)
+        console.log("")
+        mensagem = ""
+    }
 }
 
 const start = async () => {
     while (true) {
+        mostrarMensagem()
         const opcao = await select({
             message: "Menu >",
             choices: [
